@@ -7,8 +7,9 @@ Vue.use(Vuex)
 // handle page reload
 fb.auth.onAuthStateChanged(user => {
     if (user) {
-        store.commit('setCurrentUser', user)
-        store.dispatch('fetchUserProfile')
+        console.log("onAuthStateChanged", user)
+        store.commit('setCurrentUser', user) //mutation
+        store.dispatch('fetchUserProfile') //action
 
         fb.usersCollection.doc(user.uid).onSnapshot(doc => {
             store.commit('setUserProfile', doc.data())
@@ -59,13 +60,17 @@ export const store = new Vuex.Store({
             commit('setPosts', null)
             commit('setHiddenPosts', null)
         },
+        //fetch profile from firebase
         fetchUserProfile({ commit, state }) {
+            console.log("fetchUserProfile-state.currentUser", state.currentUser)
             fb.usersCollection.doc(state.currentUser.uid).get().then(res => {
-                commit('setUserProfile', res.data())
+                console.log("state.currentUser.uid", res.data())
+                commit('setUserProfile', res.data()) //mutation
             }).catch(err => {
                 console.log(err)
             })
         },
+        //change profile in firebase
         updateProfile({ commit, state }, data) {
             let name = data.name
             let title = data.title

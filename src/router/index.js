@@ -5,6 +5,7 @@ import firebase from 'firebase'
 import Login from '@/components/Login'
 import Dashboard from '@/components/Dashboard'
 import Settings from '@/components/Settings'
+import readme from '@/components/InstallReadMe'
 
 Vue.use(Router)
 
@@ -35,6 +36,11 @@ const router = new Router({
             meta: {
                 requiresAuth: true
             }
+		},
+		{
+			path: '/readme',
+			name: 'readme',
+			component: readme,
 		}
 	]
 })

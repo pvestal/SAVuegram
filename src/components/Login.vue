@@ -7,9 +7,8 @@
         </transition>
         <section>
             <div class="col1">
-                <h1>Vuegram</h1>
-                <p>Welcome to the <a href="https://savvyapps.com/" target="_blank">Savvy Apps</a> sample social media web app powered by Vue.js and Firebase.
-                    Build this project by checking out The Definitive Guide to Getting Started with Vue.js</p>
+                <h1>Patrick's Blog</h1>
+                <p>Welcome to my sample social media web app powered by Vue.js and Firebase.</p>
             </div>
             <div class="col2" :class="{ 'signup-form': !showLoginForm && !showForgotPassword }">
                 <form v-if="showLoginForm" @submit.prevent>
@@ -26,16 +25,17 @@
                     <div class="extras">
                         <a @click="togglePasswordReset">Forgot Password</a>
                         <a @click="toggleForm">Create an Account</a>
+                        <a @click="googleSignIn">Google Login</a>
                     </div>
                 </form>
                 <form v-if="!showLoginForm && !showForgotPassword" @submit.prevent>
                     <h1>Get Started</h1>
 
                     <label for="name">Name</label>
-                    <input v-model.trim="signupForm.name" type="text" placeholder="Savvy Apps" id="name" />
+                    <input v-model.trim="signupForm.name" type="text" placeholder="Your Display Name" id="name" />
 
-                    <label for="title">Title</label>
-                    <input v-model.trim="signupForm.title" type="text" placeholder="Company" id="title" />
+                    <label for="title">Job Title</label>
+                    <input v-model.trim="signupForm.title" type="text" placeholder="Job Title" id="title" />
 
                     <label for="email2">Email</label>
                     <input v-model.trim="signupForm.email" type="text" placeholder="you@email.com" id="email2" />
@@ -46,6 +46,7 @@
                     <button @click="signup" class="button">Sign Up</button>
 
                     <div class="extras">
+                        <a @click="googleSignIn">Google Login</a>
                         <a @click="toggleForm">Back to Log In</a>
                     </div>
                 </form>
@@ -124,6 +125,7 @@
                 this.performingRequest = true
 
                 fb.auth.signInWithEmailAndPassword(this.loginForm.email, this.loginForm.password).then(user => {
+                    console.log("user obj", user)
                     this.$store.commit('setCurrentUser', user)
                     this.$store.dispatch('fetchUserProfile')
                     this.performingRequest = false
@@ -138,12 +140,47 @@
                 this.performingRequest = true
 
                 fb.auth.createUserWithEmailAndPassword(this.signupForm.email, this.signupForm.password).then(user => {
-                    this.$store.commit('setCurrentUser', user)
+                    this.$store.commit('setCurrentUser', user) //mutation
 
                     // create user obj
                     fb.usersCollection.doc(user.uid).set({
                         name: this.signupForm.name,
                         title: this.signupForm.title
+                    }).then(() => {
+                        this.$store.dispatch('fetchUserProfile')
+                        this.performingRequest = false
+                        this.$router.push('/dashboard')
+                    }).catch(err => {
+                        console.log(err)
+                        this.performingRequest = false
+                        this.errorMsg = err.message
+                    })
+                }).catch(err => {
+                    console.log(err)
+                    this.performingRequest = false
+                    this.errorMsg = err.message
+                })
+            },
+            googleSignIn() {
+                this.performingRequest = true
+                
+                var provider = fb.googleProvider
+                //console.log(provider)
+                //provider.addScope("https://www.googleapis.com/auth/userinfo.email")
+                // provider.addScope('profile')
+                // provider.addScope('email')
+                provider.addScope("https://www.googleapis.com/auth/userinfo.profile");
+                
+                fb.auth.signInWithPopup(provider).then(data => {
+                    console.log("google user", data.user)
+                    this.$store.commit('setCurrentUser', data.user) //mutation
+                    
+                    const profile = data.user
+                    console.log("profile", profile)
+                    // create user obj
+                    fb.usersCollection.doc(profile.uid).set({
+                        name: profile.displayName,
+                        title: profile.email
                     }).then(() => {
                         this.$store.dispatch('fetchUserProfile')
                         this.performingRequest = false

@@ -2,11 +2,12 @@
     <header>
         <section>
             <div class="col1">
-                <router-link to="dashboard"><h3>Vuegram</h3></router-link>
+                <router-link to="dashboard"><h3>Patrick's Blog</h3></router-link>
                 <ul class="inline">
                     <li><router-link to="dashboard">Dashboard</router-link></li>
                     <li><router-link to="settings">Settings</router-link></li>
-                    <li><a @click="logout">logout</a></li>
+                    <li><router-link to="readme">Install Readme</router-link></li>
+                    <li><a @click="logout">Logout</a></li>
                 </ul>
             </div>
         </section>
