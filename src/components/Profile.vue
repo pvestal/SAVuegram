@@ -1,8 +1,8 @@
 <template>
-    <section id="settings">
+    <section id="profile">
         <div class="col1">
-            <h3>Settings</h3>
-            <p>Update your profile</p>
+            <h3>Profile</h3>
+            <p>We like you just the way you are, but in case you need to change something.</p>
 
             <transition name="fade">
                 <p v-if="showSuccess" class="success">profile updated</p>

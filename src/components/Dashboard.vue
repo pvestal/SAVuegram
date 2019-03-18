@@ -6,10 +6,11 @@
                     <h5>{{ userProfile.name }}</h5>
                     <p>{{ userProfile.title }}</p>
                     <div class="create-post">
-                        <p>create a post</p>
+                        <p>Post Something</p>
                         <form @submit.prevent>
+                            <input v-model.trim="post.category" type="text" />
                             <textarea v-model.trim="post.content"></textarea>
-                            <button @click="createPost" :disabled="post.content == ''" class="button">post</button>
+                            <button @click="createPost" :disabled="isDisabled" class="button">Post</button>
                         </form>
                     </div>
                 </div>
@@ -28,6 +29,9 @@
                         <h5>{{ post.userName }}</h5>
                         <span>{{ post.createdOn | formatDate }}</span>
                         <p>{{ post.content | trimLength }}</p>
+                        <ul>
+                            <li>{{post.category}}</li>
+                        </ul>
                         <ul>
                             <li><a @click="openCommentModal(post)">comments {{ post.comments }}</a></li>
                             <li><a @click="likePost(post.id, post.likes)">likes {{ post.likes }}</a></li>
@@ -65,6 +69,9 @@
                         <span>{{ fullPost.createdOn | formatDate }}</span>
                         <p>{{ fullPost.content }}</p>
                         <ul>
+                            <li>{{fullPost.category}}</li>
+                        </ul>
+                        <ul>
                             <li><a>comments {{ fullPost.comments }}</a></li>
                             <li><a>likes {{ fullPost.likes }}</a></li>
                         </ul>
@@ -91,7 +98,8 @@
         data() {
             return {
                 post: {
-                    content: ''
+                    content: '',
+                    category: ''
                 },
                 comment: {
                     postId: '',
@@ -106,19 +114,29 @@
             }
         },
         computed: {
-            ...mapState(['userProfile', 'currentUser', 'posts', 'hiddenPosts'])
+            ...mapState(['userProfile', 'currentUser', 'posts', 'hiddenPosts']),
+            isDisabled () {
+                if (this.post.content.length > 3 && this.post.category.length > 3) {
+                    return false;
+                } else {
+                    return true;
+                    }
+                }
         },
         methods: {
             createPost() {
                 fb.postsCollection.add({
                     createdOn: new Date(),
+                    category: this.post.category,
                     content: this.post.content,
                     userId: this.currentUser.uid,
                     userName: this.userProfile.name,
                     comments: 0,
                     likes: 0
                 }).then(ref => {
+                    //clear the inputs
                     this.post.content = ''
+                    this.post.category = ''
                 }).catch(err => {
                     console.log(err)
                 })

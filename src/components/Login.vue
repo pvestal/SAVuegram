@@ -8,7 +8,7 @@
         <section>
             <div class="col1">
                 <h1>Patrick's Blog</h1>
-                <p>Welcome to my sample social media web app powered by Vue.js and Firebase.</p>
+                <p>Welcome to my snip-it web app powered by Vue.js and Firebase.</p>
             </div>
             <div class="col2" :class="{ 'signup-form': !showLoginForm && !showForgotPassword }">
                 <form v-if="showLoginForm" @submit.prevent>
